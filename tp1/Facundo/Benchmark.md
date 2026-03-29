@@ -24,3 +24,55 @@ A continuación, se describen los programas más utilizados para evaluar el hard
 | **HWiNFO64** | **Diagnóstico** | Proporciona información detallada sobre todos los sensores del equipo (temperatura, voltajes y frecuencias) en tiempo real. |
 
 ---
+
+
+
+# ⚔️ Comparativa de Rendimiento: Intel vs. AMD
+
+Para poner en perspectiva los conceptos de benchmarking, analizamos el enfrentamiento entre dos referentes del mercado: el **Intel Core i5-13600K** y el **AMD Ryzen 9 5900X**.
+
+### 💻 Especificaciones Base (Intel Core i5-13600K)
+* **Núcleos/Hilos:** 14 núcleos (6P + 8E) / 20 hilos.
+* **Frecuencia Máxima:** 5.1 GHz.
+* **Arquitectura:** Híbrida de 13ª Generación.
+
+---
+
+## ⏱️ Caso 1: Compilación de Kernel de Linux
+La compilación es una tarea que estresa todos los núcleos del procesador. Según los datos de rendimiento, el procesador de Intel logra una ligera ventaja en eficiencia temporal:
+
+| Procesador | Tiempo de Compilación (Promedio) | Resultado |
+| :--- | :--- | :--- |
+| **Intel Core i5-13600K** | **72 ± 5 segundos** | 🏆 **Ganador** |
+| AMD Ryzen 9 5900X | 76 ± 8 segundos | - |
+
+> **Conclusión:** En tareas de procesamiento bruto de código, la arquitectura de Intel demuestra una ejecución más ágil.
+
+---
+
+## 📊 Caso 2: Datos de OpenBenchmark.org
+Al analizar las comparaciones públicas de usuarios, encontramos una muestra de **378 benchmarks en común**. El dominio de Intel en esta generación es notable:
+
+* **Tasa de Victoria (Intel):** 79% de los tests ganados.
+* **Casos Específicos:**
+    * 📂 **Compilación de Código:** Mayor rendimiento en la familia Intel.
+    * 🔐 **OpenSSL:** Superioridad para el **Ryzen 9**, demostrando que AMD sigue siendo fuerte en tareas criptográficas específicas.
+
+---
+
+## 🎨 Caso 3: Renderizado 3D (Cinebench)
+El renderizado es la prueba de fuego para la potencia mononúcleo y multinúcleo. Basado en los registros de [NanoReview](https://nanoreview.net/en/cpu-list/cinebench-scores):
+
+| Test Cinebench | Líder en Performance |
+| :--- | :--- |
+| **Single-Core** | **Intel Core i5-13600K** |
+| **Multi-Core** | **Intel Core i5-13600K** |
+
+---
+
+## ⚖️ El factor "Cuello de Botella" y GPU
+Es importante notar que el rendimiento no depende únicamente de la CPU. En tareas como **Gaming** o **Edición de Video**, entra en juego la combinación de hardware:
+
+1. **Sinergia CPU + GPU:** El rendimiento final es el resultado de qué tan bien trabajan juntos ambos componentes.
+2. **Cuello de Botella (Bottleneck):** Una CPU débil puede limitar a una GPU potente, desperdiciando dinero y potencia.
+3. **Relación Calidad/Precio:** El objetivo final del benchmarking es determinar qué combinación ofrece la mayor cantidad de "rendimiento por dólar" invertido.
