@@ -14,5 +14,5 @@ Utilizamos ramas propias y mergeamos a main
 # Índice de Documentación de trabajos
 
 1. [TP0 - Ejercicios linux](tp0/README.md)
-2. [TP1 -Rendimineto](tp1/README.md)
+2. [TP1 -Rendimiento](tp1/README.md)
 ---
