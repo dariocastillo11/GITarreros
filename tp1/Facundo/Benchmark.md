@@ -50,7 +50,7 @@ La compilación es una tarea que estresa todos los núcleos del procesador. Seg�
 
 ---
 
-## 📊 Caso 2: Datos de OpenBenchmark.org
+## 📊 Datos de OpenBenchmark.org
 Al analizar las comparaciones públicas de usuarios, encontramos una muestra de **378 benchmarks en común**. El dominio de Intel en esta generación es notable:
 
 * **Tasa de Victoria (Intel):** 79% de los tests ganados.
@@ -60,7 +60,7 @@ Al analizar las comparaciones públicas de usuarios, encontramos una muestra de 
 
 ---
 
-## 🎨 Caso 3: Renderizado 3D (Cinebench)
+## 🎨 Caso 2: Renderizado 3D (Cinebench)
 El renderizado es la prueba de fuego para la potencia mononúcleo y multinúcleo. Basado en los registros de [NanoReview](https://nanoreview.net/en/cpu-list/cinebench-scores):
 
 | Test Cinebench | Líder en Performance |
@@ -69,6 +69,43 @@ El renderizado es la prueba de fuego para la potencia mononúcleo y multinúcleo
 | **Multi-Core** | **Intel Core i5-13600K** |
 
 ---
+
+##   Rendimiento en Gaming (3DMark)
+Aunque 3DMark es famoso por medir la tarjeta gráfica (GPU), su prueba de CPU mide la capacidad del procesador para calcular físicas complejas en videojuegos (partículas, destrucción, multitudes).
+
+* **Intel Core i5-13600K (CPU Score):** 17,500 puntos.
+* **AMD Ryzen 9 5900X (CPU Score):** 14,000 puntos.
+
+ **Conclusión:** Si el objetivo principal del equipo es el **Gaming**, el i5-13600K es una opción superior, garantizando que el procesador no haga "cuello de botella" con tarjetas gráficas de gama alta.
+
+---
+
+##   Tareas Cotidianas y Productividad 
+Geekbench nos permite ver cómo se comportan estos procesadores en escenarios del día a día (navegación pesada, compresión de archivos, procesamiento de fotos). 
+
+| Tipo de Carga | Intel Core i5-13600K | AMD Ryzen 9 5900X |
+| :--- | :--- | :--- |
+| **Single-Core** | 2,700 pts | 2,100 pts |
+| **Multi-Core** | 16,500 pts | 13,000 pts |
+
+ **Conclusión:** La arquitectura híbrida de Intel permite que los "E-cores" (núcleos de eficiencia) manejen las tareas de fondo, dejando los "P-cores" (núcleos de rendimiento) libres para las tareas principales, logrando una fluidez notable.
+
+
+---
+
+## Consumo Energético y Temperaturas (OCCT + HWiNFO64)
+El costo energético y térmico cuando estresamos los equipos al 100% usando herramientas como OCCT.
+
+| Especificación | Intel Core i5-13600K | AMD Ryzen 9 5900X |
+| :--- | :--- | :--- |
+| **TDP Base** | 125 W | 105 W |
+| **Consumo Máximo (Carga 100%)** | **181 W** | **142 W** |
+| **Temperatura Promedio bajo estrés** | Más alta (Requiere buen AIO/Cooler) | Más moderada |
+
+ **Conclusión:** Aquí es donde AMD saca ventaja. El **Ryzen 9 5900X es considerablemente más eficiente energéticamente**. El procesador de Intel, para lograr esos picos de rendimiento, necesita consumir mucha más electricidad y genera más calor, obligando al usuario a invertir más en un buen sistema de refrigeración.
+
+---
+
 
 # 📊 Rendimiento, Speedup y Eficiencia
 
