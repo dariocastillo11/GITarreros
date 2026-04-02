@@ -146,3 +146,88 @@ En tu terminal:
 ```
 python3 app.py
 ```
+
+
+---
+resultado:
+```
+dario@dario-N-737R:~/Escritorio/SistemaDeComputacion/SistemaDeComputacion/tp2$ python3 app.py
+[Python] Enviando 42 a la capa C...
+[C] Recibi el valor 42 de Python. Llamando a Assembler...
+[C] Assembler respondio 43. Devolviendo a Python...
+[Python] El resultado final es: 43
+```
+---
+
+Paso 7: Consumir la API REST en Python
+
+El enunciado te da una URL del Banco Mundial para el índice GINI de Argentina. Si entramos a esa URL, nos devuelve un JSON (un formato de texto que Python entiende como una lista de diccionarios).
+Primero, instalá la librería necesaria:
+
+```
+python3 -m venv env
+source env/bin/activate
+pip install requests
+```
+
+...
+modificacion de app.py
+```
+import ctypes
+import os
+import requests
+
+# 1. Configurar la Librería C (Igual que antes)
+lib_path = os.path.abspath("./libcalculo.so")
+lib = ctypes.CDLL(lib_path)
+lib.procesar_indice.argtypes = (ctypes.c_long,)
+lib.procesar_indice.restype = ctypes.c_long
+
+def obtener_gini_argentina():
+    # URL oficial del Banco Mundial para Argentina (GINI 2011-2020)
+    url = "https://api.worldbank.org/v2/en/country/AR/indicator/SI.POV.GINI?format=json&date=2011:2020"
+    
+    print(f"[Python] Consultando API del Banco Mundial...")
+    response = requests.get(url)
+    
+    if response.status_code == 200:
+        data = response.json()
+        # El JSON del Banco Mundial tiene los datos en la posición [1]
+        # Buscamos el primer valor que no sea None (el más reciente)
+        for registro in data[1]:
+            if registro['value'] is not None:
+                valor_gini = registro['value']
+                anio = registro['date']
+                print(f"[Python] Dato encontrado: GINI Argentina ({anio}) = {valor_gini}")
+                return valor_gini
+    else:
+        print("[Python] Error al consultar la API")
+        return None
+
+# --- EJECUCIÓN ---
+valor_real = obtener_gini_argentina()
+
+if valor_real:
+    # OJO: El enunciado dice que Assembler debe convertir de float a entero.
+    # Por ahora, como nuestra función C recibe 'long', vamos a redondearlo en Python
+    # para probar. Luego lo haremos "legalmente" pasando el float a C.
+    valor_entero = int(valor_real) 
+    
+    print(f"[Python] Enviando {valor_entero} a la capa C...")
+    resultado = lib.procesar_indice(valor_entero)
+    print(f"[Python] Resultado final (GINI + 1): {resultado}")
+```
+
+---
+resultados:
+```
+env) dario@dario-N-737R:~/Escritorio/SistemaDeComputacion/SistemaDeComputacion/tp2$ python3 app.py
+[Python] Consultando API del Banco Mundial...
+[Python] Dato encontrado: GINI Argentina (2020) = 42.7
+[Python] Enviando 42 a la capa C...
+[C] Recibi el valor 42 de Python. Llamando a Assembler...
+[C] Assembler respondio 43. Devolviendo a Python...
+[Python] Resultado final (GINI + 1): 43
+```
+---
+
