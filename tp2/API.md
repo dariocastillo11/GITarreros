@@ -9,27 +9,27 @@ sudo apt install build-essential nasm gcc-multilib g++-multilib libcurl4-openssl
 ```
 
 ejemplo asm conectado a c:
-```bash
-    global sumar_uno ; Hacemos que la función sea visible para C
+```c++
+        global sumar_uno ; Hacemos que la función sea visible para C
 
-sumar_uno:
-    ; Por convención (System V ABI):
-    ; El primer argumento que manda C llega en el registro RDI
-    ; El resultado que devolvemos a C debe quedar en el registro RAX
-    
-    mov rax, rdi    ; Pasamos el número recibido a RAX
-    add rax, 1      ; Le sumamos 1
-    ret             ; Volvemos a C
+    sumar_uno:
+        ; Por convención (System V ABI):
+        ; El primer argumento que manda C llega en el registro RDI
+        ; El resultado que devolvemos a C debe quedar en el registro RAX
+        
+        mov rax, rdi    ; Pasamos el número recibido a RAX
+        add rax, 1      ; Le sumamos 1
+        ret             ; Volvemos a C
 ```
 ---
 ---
 compilacion asemble:
-```
+```bash
 nasm -f elf64 calculo.asm -o calculo.o
 ```
 
 ---
-```bash 
+```c++
 #include <stdio.h>
 
 // Le avisamos a C que existe una función externa llamada sumar_uno
@@ -47,24 +47,24 @@ int main() {
 ```
 ---
 compilacion asemble:
-```
+```bash
 nasm -f elf64 calculo.asm -o calculo.o
 ```
 ---
 ---
 compilacion c:
-```
+```bash
 gcc -c main.c -o main.o
 ```
 ---
 
 binarios  .o creados . pero son 2. los uno con:
-```
+```bash
 gcc main.o calculo.o -o mi_programa
 ```
 ---
 ejecuto:
-```
+```bash
 ./mi_programa
 ```
 
@@ -81,7 +81,7 @@ Para que Python pueda usar tu código de C, no podemos usar un ejecutable común
 Crea un archivo nuevo llamado interfaz.c. Es casi igual al anterior, pero sin el main, porque el "dueño" del programa ahora será Python.
 
 
-```
+```c++
 #include <stdio.h>
 
 // Función externa en Assembler
@@ -102,7 +102,7 @@ long procesar_indice(long valor) {
 
 Ejecutamos estos comandos para crear libcalculo.so:
 
-```
+```bash
 # 1. Assembler (igual que antes)
 nasm -f elf64 calculo.asm -o calculo.o
 
@@ -117,7 +117,8 @@ gcc -shared interfaz.o calculo.o -o libcalculo.so
 3. El código de Python: app.py
 
 Crea un archivo app.py. Usaremos ctypes para cargar la librería.
-```
+```c++
+
 import ctypes
 import os
 
@@ -143,14 +144,14 @@ print(f"[Python] El resultado final es: {resultado}")
 4. Ejecutar la prueba total
 
 En tu terminal:
-```
+```bash
 python3 app.py
 ```
 
 
 ---
 resultado:
-```
+```bash
 dario@dario-N-737R:~/Escritorio/SistemaDeComputacion/SistemaDeComputacion/tp2$ python3 app.py
 [Python] Enviando 42 a la capa C...
 [C] Recibi el valor 42 de Python. Llamando a Assembler...
@@ -164,7 +165,7 @@ Paso 7: Consumir la API REST en Python
 El enunciado te da una URL del Banco Mundial para el índice GINI de Argentina. Si entramos a esa URL, nos devuelve un JSON (un formato de texto que Python entiende como una lista de diccionarios).
 Primero, instalá la librería necesaria:
 
-```
+```bash
 python3 -m venv env
 source env/bin/activate
 pip install requests
@@ -172,7 +173,7 @@ pip install requests
 
 ...
 modificacion de app.py
-```
+```c++
 import ctypes
 import os
 import requests
@@ -220,8 +221,8 @@ if valor_real:
 
 ---
 resultados:
-```
-env) dario@dario-N-737R:~/Escritorio/SistemaDeComputacion/SistemaDeComputacion/tp2$ python3 app.py
+```bash
+(env) dario@dario-N-737R:~/Escritorio/SistemaDeComputacion/SistemaDeComputacion/tp2$ python3 app.py
 [Python] Consultando API del Banco Mundial...
 [Python] Dato encontrado: GINI Argentina (2020) = 42.7
 [Python] Enviando 42 a la capa C...
@@ -233,7 +234,7 @@ env) dario@dario-N-737R:~/Escritorio/SistemaDeComputacion/SistemaDeComputacion/t
 
 PROBLEMAS: sumacomo int no como foat. modiifcacion en calculo.asm:
 
-```
+```asm
 section .text
     global sumar_uno
 
@@ -247,7 +248,7 @@ sumar_uno:
 ```
 ---
 
-```
+```c++
 #include <stdio.h>
 
 // Función externa en Assembler
@@ -263,9 +264,9 @@ long procesar_indice(double valor) {
 ```
 
 ---
-```
+
 recompilar:
-```
+```bash
 # 1. Assembler (igual que antes)
 nasm -f elf64 calculo.asm -o calculo.o
 
@@ -276,7 +277,7 @@ gcc -c -fPIC interfaz.c -o interfaz.o
 gcc -shared interfaz.o calculo.o -o libcalculo.so
 ```
 ---
-
+```c++
 import ctypes
 import os
 import requests
@@ -320,7 +321,7 @@ if valor_real:
 ```
 
 ---
-```
+```bash
 # Borrar lo anterior para no mezclar
 rm *.o *.so
 
