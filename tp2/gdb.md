@@ -14,9 +14,10 @@
             return 0;
 
 ```
-
+# Compilo mi programa asm 
 #### dario@dario-N-737R:~/Escritorio/SistemaDeComputacion/SistemaDeComputacion/tp2$ nasm -f elf64 -g calculo.asm -o calculo.o
 
+# Compilo mi programa c que simula el de python para poder debugear
 #### dario@dario-N-737R:~/Escritorio/SistemaDeComputacion/SistemaDeComputacion/tp2$ gcc -g main_debug.c calculo.o -o programa_debug
 ```bash=
         /usr/bin/ld: warning: calculo.o: missing .note.GNU-stack section implies executable stack
@@ -30,6 +31,7 @@ SistemaDeComputacion/tp2$ ls
             app.py       calculo.o  gdb.md      interfaz.o     main.c        programa_debug
             calculo.asm  env        interfaz.c  libcalculo.so  main_debug.c  README.md
 ```
+# Ejecuto prueba GDB
 #### dario@dario-N-737R:~/Escritorio/SistemaDeComputacion/SistemaDeComputacion/tp2$ gdb ./programa_debug
 
 ```bash=
@@ -51,6 +53,7 @@ SistemaDeComputacion/tp2$ ls
             Reading symbols from ./programa_debug...
 
 ```
+# Comando li para ver codigo 
 #### (gdb) li
 
 
@@ -78,19 +81,22 @@ SistemaDeComputacion/tp2$ ls
 ```
         End of the file was already reached, use "list ." to list the current location again
 ```
-
+# Poner un breakpoint en una parte de codigo
 #### (gdb) break sumar_uno 
 
 ```
     Punto de interrupción 1 at 0x11b0: file calculo.asm, line 7.
 ```
 
+# Mostrar todos mis brackpoint
 #### (gdb) info br
 
 ```
         Num     Type           Disp Enb Address            What
         1       breakpoint     keep y   0x00000000000011b0 calculo.asm:7
 ```
+
+# Correr GDB. Se detiene en los breackpoint
 #### (gdb) run
 
 ```bash=
@@ -110,17 +116,7 @@ SistemaDeComputacion/tp2$ ls
         7	    cvttsd2si rax, xmm0  ; Convierte el double (XMM0) a entero (RAX) -> RAX = 42
 
 ```
-#### (gdb) info rax
-```
-        info orden indefinida: «rax». Intente con «help info»
-```
-
-#### (gdb) info  xmm0
-```
-
-        info orden indefinida: «xmm0». Intente con «help info»
-
-```
+# Puedo ver manual de GDB . 
 #### (gdb) help info
 ```bash=
         info, inf, i
@@ -217,6 +213,9 @@ SistemaDeComputacion/tp2$ ls
         8	    add rax, 1           ; Sumamos 1 -> RAX = 43
         9	    ret
 ```
+rax es un registro de enteros, y xmm0 un registre de double. cvttsd2si convierte el doble a entero.
+
+# Abreviaciones: RUN r, NEXT n, STEP s, BREACKPOINT br
 #### (gdb) r
 
 
@@ -232,6 +231,7 @@ SistemaDeComputacion/tp2$ ls
         7	    cvttsd2si rax, xmm0  ; Convierte el double (XMM0) a entero (RAX) -> RAX = 42
 
 ```
+# Ver contenido de un registro
 #### (gdb) ptype rax
 
 ```bash=
@@ -240,19 +240,37 @@ SistemaDeComputacion/tp2$ ls
         (gdb) info register rax
         rax            0x404559999999999a  4631206308062271898
 ```
-#### (gdb) info register xmm
-```
-        Registro inválido «xmm»
-```
+
+
+# Ver informacion de un registro
 #### (gdb) info register xmm0
 ```bash
-        xmm0           {v8_bfloat16 = {0x999a, 0x9999, 0x5999, 0x4045, 0x0, 0x0, 0x0, 0x0}, v8_half = {0x999a, 0x9999, 0x5999, 0x4045, 0x0, 0x0, 0x0, 0x0}, v4_float = {0x9999999a, 0x40455999, 0x0, 0x0}, v2_double = {0x404559999999999a, 0x0}, v16_int8 = {0x9a, 0x99, 0x99, 0x99, 0x99, 0x59, 0x45, 0x40, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}, v8_int16 = {0x999a, 0x9999, 0x5999, 0x4045, 0x0, 0x0, 0x0, 0x0}, v4_int32 = {0x9999999a, 0x40455999, 0x0, 0x0}, v2_int64 = {0x404559999999999a, 0x0}, uint128 = 0x404559999999999a}
-```
+        xmm0{  
+                v8_bfloat16 = {0x999a, 0x9999, 0x5999, 0x4045, 0x0, 0x0, 0x0, 0x0},
 
+                v8_half = {0x999a, 0x9999, 0x5999, 0x4045, 0x0, 0x0, 0x0, 0x0}, 
+
+                v4_float = {0x9999999a, 0x40455999, 0x0, 0x0}, 
+
+                v2_double = {0x404559999999999a, 0x0}, #El que nos interesa ver
+
+                v16_int8 = {0x9a, 0x99, 0x99, 0x99, 0x99, 0x59, 0x45, 0x40, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}, 
+
+                v8_int16 = {0x999a, 0x9999, 0x5999, 0x4045, 0x0, 0x0, 0x0, 0x0}, 
+
+                v4_int32 = {0x9999999a, 0x40455999, 0x0, 0x0},
+
+                v2_int64 = {0x404559999999999a, 0x0}, 
+
+                uint128 = 0x404559999999999a
+        }
+
+```
+# imprimo con print o p el valor del double almacenado en xmm0
 #### (gdb) p $xmm0.v2_double
 
-```
-        $1 = {42.700000000000003, 0}
+```bash
+        $1 = {42.700000000000003, 0} # Vemos que es nuestro 42.7 double
 ```
 
 #### (gdb) print $xmm0.v2_double
@@ -260,45 +278,58 @@ SistemaDeComputacion/tp2$ ls
 ```
         $2 = {42.700000000000003, 0}
 ```
-
+# Veo tipo de dato del registro con ptype
 #### (gdb) ptype $xmm0.v2_double
 
-```
+```bash
         type = builtin_type_ieee_double __attribute__ ((vector_size(2)))
+        # nos da la info de registro. Un vectr de tamaño 2.
 ```
-
+# Veo la info de tipo de dato de funciones con Ptype
 #### (gdb) Ptype $xmm0.v2_double
 
-```
+```bash
         orden indefinida: «Ptype». Intente con «help»
+        # No funciona porque no e suna funcion, es un registro
 ```
-
+# Veo el stack Pila. Direcciones de retorno.
 #### (gdb) x/10gx $rsp
 
-```
+```bash 
         0x7fffffffdae8:	0x000055555555517f	0x404559999999999a
+                        #direccion memoria a retornar : 0x000055555555517f
+
         0x7fffffffdaf8:	0x00007fffffffdc28	0x00007fffffffdba0
+
         0x7fffffffdb08:	0x00007ffff7c2a1ca	0x00007fffffffdb50
+
         0x7fffffffdb18:	0x00007fffffffdc28	0x0000000155554040
+
         0x7fffffffdb28:	0x0000555555555149	0x00007fffffffdc28
 ```
+### Cuando C llama a ASM  o primero que hace es anotar la direccion de memoria a la cual debe retornar cuando termine
 
+
+# Nos entramos dentro de la funcion sumar_uno. Codigo ASM. Con stepi
 #### (gdb) stepi
 
-```
+```bash 
         8	    add rax, 1           ; Sumamos 1 -> RAX = 43
 ```
 
 
 #### (gdb) info register rax
-```
+```bash 
 
-        rax            0x2a                42
+        rax            0x2a                42 #rax tiene un 42
 ```
+# Compruebo que pila no cambio, tampoco el valor del registro aun:
+
 #### (gdb) x/10gx $rsp
 
-```
+```bash
         0x7fffffffdae8:	0x000055555555517f	0x404559999999999a
+        #Mismo valor
         0x7fffffffdaf8:	0x00007fffffffdc28	0x00007fffffffdba0
         0x7fffffffdb08:	0x00007ffff7c2a1ca	0x00007fffffffdb50
         0x7fffffffdb18:	0x00007fffffffdc28	0x0000000155554040
@@ -317,107 +348,53 @@ SistemaDeComputacion/tp2$ ls
         $3 = {42.700000000000003, 0}
 ```
 
-
+# Ejecuto sigueinte instruccion. 
 #### (gdb) stepi
 
 ```
         9	    ret
 ```
 
+# Visualizo porque deberia cambiar la pila y datos del registros:
 #### (gdb) info register rax
 
-```
-        rax            0x2b                43
+```bash
+        rax            0x2b                43 # Ahora rax vale 43. Le sumamos el 1
 ```
 
 #### (gdb) x/10gx $rsp
 
-```
+```bash
         0x7fffffffdae8:	0x000055555555517f	0x404559999999999a
+        # La Pila sigue igual . Porque aun no nos salimos del ASM
+
         0x7fffffffdaf8:	0x00007fffffffdc28	0x00007fffffffdba0
         0x7fffffffdb08:	0x00007ffff7c2a1ca	0x00007fffffffdb50
         0x7fffffffdb18:	0x00007fffffffdc28	0x0000000155554040
         0x7fffffffdb28:	0x0000555555555149	0x00007fffffffdc28
 ```
 
-
-####(gdb) ptype $xmm0.v2_double
-
-```
-        type = builtin_type_ieee_double __attribute__ ((vector_size(2)))
-```
+# Siguiente instruccion nos volvemos a C. Retomamos la direccion de la pila:
 
 #### (gdb) stepi
-```
+```bash
         0x000055555555517f in main () at main_debug.c:9
         9	    long resultado = sumar_uno(valor_test);
 ```
 #### (gdb) info register rax
-```
-        rax            0x2b                43
-```
-#### (gdb) ptype $xmm0.v2_double
-```
-        type = builtin_type_ieee_double __attribute__ ((vector_size(2)))
-```
-#### (gdb) stepi
-```
-        10	    printf("Resultado final: %ld\n", resultado);
-```
-#### (gdb) info register rax
-```
-        rax            0x2b                43
-```
-#### (gdb) x/10gx $rsp
-```
-
-        0x7fffffffdaf0:	0x404559999999999a	0x000000000000002b
-        0x7fffffffdb00:	0x00007fffffffdba0	0x00007ffff7c2a1ca
-        0x7fffffffdb10:	0x00007fffffffdb50	0x00007fffffffdc28
-        0x7fffffffdb20:	0x0000000155554040	0x0000555555555149
-        0x7fffffffdb30:	0x00007fffffffdc28	0x0ea35a5894db1af2
-```
-#### (gdb) info register rax
-```
-        rax            0x2b                43
-```
-#### (gdb) stepi
-```
-        0x0000555555555187	10	    printf("Resultado final: %ld\n", resultado);
-        (gdb) x/10gx $rsp
-        0x7fffffffdaf0:	0x404559999999999a	0x000000000000002b
-        0x7fffffffdb00:	0x00007fffffffdba0	0x00007ffff7c2a1ca
-        0x7fffffffdb10:	0x00007fffffffdb50	0x00007fffffffdc28
-        0x7fffffffdb20:	0x0000000155554040	0x0000555555555149
-        0x7fffffffdb30:	0x00007fffffffdc28	0x0ea35a5894db1af2
-```
-#### (gdb) info register rax
-```
-        rax            0x2b                43
-```
-#### (gdb) stepi
-```
-        0x000055555555518a	10	    printf("Resultado final: %ld\n", resultado);
+```bash
+        rax            0x2b                43 #rax quedo con 43 
 ```
 
 #### (gdb) x/10gx $rsp
+```bash
 
-```
         0x7fffffffdaf0:	0x404559999999999a	0x000000000000002b
+        # Pila cambio de valor , vemos que todas las direcciones de la derecha se desplazaron hacia la izquierda
+
         0x7fffffffdb00:	0x00007fffffffdba0	0x00007ffff7c2a1ca
         0x7fffffffdb10:	0x00007fffffffdb50	0x00007fffffffdc28
         0x7fffffffdb20:	0x0000000155554040	0x0000555555555149
         0x7fffffffdb30:	0x00007fffffffdc28	0x0ea35a5894db1af2
 ```
-
-#### (gdb) info register rax
-```
-        rax            0x2b                43
-```
-
-
-
-
-
-
-
+---
