@@ -1,11 +1,9 @@
 section .text
-    global sumar_uno ; Hacemos que la función sea visible para C
+    global sumar_uno
 
 sumar_uno:
-    ; Por convención (System V ABI):
-    ; El primer argumento que manda C llega en el registro RDI
-    ; El resultado que devolvemos a C debe quedar en el registro RAX
-    
-    mov rax, rdi    ; Pasamos el número recibido a RAX
-    add rax, 1      ; Le sumamos 1
-    ret             ; Volvemos a C
+    ; El valor decimal (42.7) entra por XMM0
+    ; cvttsd2si: Convert with Truncation Scalar Double to Signed Integer
+    cvttsd2si rax, xmm0  ; Convierte el double (XMM0) a entero (RAX) -> RAX = 42
+    add rax, 1           ; Sumamos 1 -> RAX = 43
+    ret

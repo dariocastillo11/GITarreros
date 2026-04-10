@@ -5,7 +5,7 @@ import requests
 # 1. Configurar la Librería C (Igual que antes)
 lib_path = os.path.abspath("./libcalculo.so")
 lib = ctypes.CDLL(lib_path)
-lib.procesar_indice.argtypes = (ctypes.c_long,)
+lib.procesar_indice.argtypes = (ctypes.c_double,)
 lib.procesar_indice.restype = ctypes.c_long
 
 def obtener_gini_argentina():
@@ -33,11 +33,7 @@ def obtener_gini_argentina():
 valor_real = obtener_gini_argentina()
 
 if valor_real:
-    # OJO: El enunciado dice que Assembler debe convertir de float a entero.
-    # Por ahora, como nuestra función C recibe 'long', vamos a redondearlo en Python
-    # para probar. Luego lo haremos "legalmente" pasando el float a C.
-    valor_entero = int(valor_real) 
-    
-    print(f"[Python] Enviando {valor_entero} a la capa C...")
-    resultado = lib.procesar_indice(valor_entero)
-    print(f"[Python] Resultado final (GINI + 1): {resultado}")
+
+    print(f"[Python] Enviando float {valor_real} a la capa C...")
+    resultado = lib.procesar_indice(valor_real)
+    print(f"[Python] Resultado final (GINI convertido a int + 1): {resultado}")
