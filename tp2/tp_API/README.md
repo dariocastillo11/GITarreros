@@ -44,7 +44,7 @@ Este archivo será utilizado dentro de un programa escrito en C. En nuestro caso
 #include <stdio.h>
 
 // Le avisamos a C que existe una función externa llamada sumar_uno
-extern long sumar_uno(long n);
+extern long sumar(long n);
 
 int main() {
     long numero = 10;
