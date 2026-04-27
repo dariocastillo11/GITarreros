@@ -16,7 +16,7 @@ sudo apt install build-essential nasm gcc-multilib g++-multilib libcurl4-openssl
 En este caso utilizaremos el siguiente código para sumar 1 a un registro:
 
 ```asm
-sumar_uno:
+sumar:
         ; Por convención (System V ABI):
         ; El primer argumento que manda C llega en el registro RDI
         ; El resultado que devolvemos a C debe quedar en el registro RAX
