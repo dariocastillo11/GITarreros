@@ -1,98 +1,45 @@
-# QUEMU
+# SdeC - TP3
+Modo Real y Modo Protegido 
 
+## Creación de una Imagen Booteable 
 
-Es una herramienta de código abierto extremadamente potente que sirve para dos cosas principales: **emulación** (simular hardware diferente) y **virtualización** (correr sistemas con alto rendimiento).
-
----
-
-## 1. Conceptos Básicos
-* **Emulación:** Puede imitar arquitecturas de CPU. Por ejemplo, puedes correr software de ARM (como el de una Raspberry Pi) en una PC normal (x86_64). Es lento pero muy flexible.
-* **Virtualización:** Cuando se usa junto con **KVM** (Kernel-based Virtual Machine) en Linux, funciona casi a la velocidad nativa del equipo.
-
----
-
-## 2. Cómo Instalarlo
-Dependiendo de tu sistema operativo, el comando cambia:
-
-* **Ubuntu/Debian:**
-    `sudo apt update && sudo apt install qemu-system qemu-utils`
-* **Arch Linux:**
-    `sudo pacman -S qemu-full`
-* **Fedora:**
-    `sudo dnf install qemu-kvm`
-* **macOS:**
-    `brew install qemu`
-
----
-
-## 3. Guía Rápida: Crear y Correr una Imagen
-
-Para poner en marcha una máquina virtual desde la terminal, sigue estos pasos:
-
-### Paso A: Crear el "Disco Duro" Virtual
-Primero necesitas un espacio donde instalar el sistema. Vamos a crear un archivo de 20GB en formato `qcow2` (que solo ocupa espacio a medida que lo llenas).
+### Paso 1
+Se debe generar un archivo que simule ser el primer sector de un disco duro (el Sector 0 o MBR). Para que la BIOS lo reconozca como un disco arrancable, este sector debe medir exactamente 512 bytes y tener una estructura específica
 
 ```bash
-qemu-img create -f qcow2 mi_disco.qcow2 20G
+printf '\364%509s\125\252' > main.img
 ```
+Se usó `printf` para crear un archivo (main.img) de exactamente 512 bytes, divididos en tres partes:
 
-### Paso B: Iniciar la Instalación
-Supongamos que tienes una ISO de Ubuntu. El siguiente comando arranca la máquina virtual con 4GB de RAM y conecta la ISO:
+`\364` (1 byte): Instrucción `HLT` (Halt). Congela el procesador.
 
-```bash
-qemu-system-x86_64 \
-  -m 4G \
-  -enable-kvm \
-  -drive file=mi_disco.qcow2,format=qcow2 \
-  -cdrom ubuntu-desktop.iso \
-  -boot d
-```
-> **Nota:** `-enable-kvm` es vital en Linux para que no vaya lento como una tortuga.
+`%509s` (509 bytes): Relleno de espacios en blanco para alcanzar el tamaño del sector.
 
-### Paso C: Correr la imagen ya instalada
-Una vez instalado, ya no necesitas el `-cdrom`. Simplemente arrancas desde el disco:
+`\125\252` (2 bytes): Firma de arranque (55 AA). Le indica a la BIOS que el disco es booteable.
 
-```bash
-qemu-system-x86_64 -m 4G -enable-kvm -hda mi_disco.qcow2
-```
+### Paso 2
 
----
+Como no se puede ejecutar este sector de arranque directamente en la computadora real (ya que interrumpiría el sistema operativo actual), se utilizó QEMU para simular un entorno de hardware x86_64.
 
-## 4. Diferencias Clave con VirtualBox
-| Característica | QEMU | VirtualBox / VMware |
-| :--- | :--- | :--- |
-| **Interfaz** | Principalmente terminal (CLI) | Gráfica (GUI) |
-| **Rendimiento** | Superior (con KVM) | Muy bueno |
-| **Flexibilidad** | Puede emular casi cualquier CPU | Solo x86/ARM nativo |
-| **Dificultad** | Curva de aprendizaje alta | Fácil de usar |
+<img width="717" height="292" alt="image" src="https://github.com/user-attachments/assets/b7484ad3-6362-4ea5-971a-d3993aaa743c" />
 
----
-
-
-
-
----
----
----
-
----
 
 # 1. Desafío: UEFI y coreboot
 ---
 ## **¿Qué es UEFI? ¿Cómo puedo usarlo?**
 UEFI (*Unified Extensible Firmware Interface*) es el sucesor de la BIOS. A diferencia de la BIOS, que es código de 16 bits muy limitado, UEFI es un pequeño "sistema operativo" en sí mismo, escrito en C, que corre en 32 o 64 bits.
-* **Cómo usarlo:** Para programar para UEFI, no usas interrupciones de BIOS (`int 0x10`). Debemos crear un archivo `.efi` (formato PE, como los .exe de Windows) y usar las "Boot Services" que proporciona el firmware.
+* **Cómo usarlo:** Para programar para UEFI, no se usan interrupciones de BIOS (`int 0x10`). Debe crearse un archivo `.efi` (formato PE, como los .exe de Windows) y usar las "Boot Services" que proporciona el firmware.
 * **Función de ejemplo:** `Print()` o `OutputString()`. En UEFI se accede a través de una tabla de punteros llamada `SystemTable->ConOut->OutputString`.
 ---
 
 ## **Bugs de UEFI explotados:**
 Al ser un software complejo, tiene vulnerabilidades.
 * **LogoFAIL:** Reciente bug donde atacantes usan imágenes de logo de arranque (JPG/BMP) maliciosas para ejecutar código antes que el SO.
-* **BlackLotus:** Un bootkit que logra saltarse el *Secure Boot* (Arranque Seguro) para persistir en el sistema incluso si reinstalas Windows.
+* **BlackLotus:** Un bootkit que logra saltarse el *Secure Boot* (Arranque Seguro) para persistir en el sistema incluso si se reinstala Windows.
 ---
-## **¿Qué es CSME y Intel MEBx?**
-* **CSME:** Converged Security and Management Engine Es un subsistema dentro de los procesadores Intel que corre un kernel (generalmente Minix) totalmente independiente del procesador principal. Controla el encendido, la criptografía y la gestión remota. Es "el anillo -3" de seguridad.
-* **Intel MEBx:** the Intel Management Engine BIOS Extension Es la interfaz de configuración de este motor. Se suele acceder con `Ctrl+P` durante el booteo para configurar la administración remota (AMT).
+## **CSME y Intel MEBx**
+* **CSME:** Converged Security and Management Engine es un subsistema dentro de los procesadores Intel que corre un kernel (generalmente Minix) totalmente independiente del procesador principal. Controla el encendido, la criptografía y la gestión remota. Es el anillo -3 de seguridad.
+* **Intel MEBx:** Intel Management Engine BIOS Extension es la interfaz de configuración de este motor. Se suele acceder con `Ctrl+P` durante el booteo para configurar la administración remota (AMT).
 ---
 ## **¿Qué es Coreboot?**
 Es un proyecto de software libre que busca reemplazar la BIOS/UEFI privativa de las placas base por un firmware mínimo y rápido.
@@ -178,13 +125,13 @@ Es una dirección **mágica**. Por estándar histórico, la BIOS busca el primer
 * **Necesidad:** El linker necesita saber esto para que las etiquetas (como `msg`) tengan la dirección de memoria real correcta. Si el linker cree que el código empieza en `0x0000` pero la BIOS lo pone en `0x7C00`, el programa buscará el texto en el lugar equivocado y fallará.
 
 **Opción `--oformat binary`:**
-Normalmente, el linker crea archivos tipo ELF (que tienen cabeceras para Linux). La opción `binary` le dice: "No pongas metadatos, solo tira los bytes puros de mi código uno tras otro". Esto es vital porque el hardware real no entiende formatos de archivos, solo ejecuta bytes.
+Normalmente, el linker crea archivos tipo ELF (que tienen cabeceras para Linux). La opción `binary` le exige tirar los bytes puros. Esto es vital porque el hardware real no entiende formatos de archivos, solo ejecuta bytes.
 
 ---
 
 ## 3. Comparativa: `objdump` vs `hd` (Heardump)
 
-1.  `objdump -D main.o`: Veremos el código ensamblador y cómo el linker aún no sabe las direcciones finales:
+1.  `objdump -D main.o`: Se verá el código ensamblador y cómo el linker aún no sabe las direcciones finales:
 ```bash
 dario@dario-N-737R:~/Escritorio/SistemaDeComputacion/SistemaDeComputacion/tp3$ objdump -D main.o
 
@@ -329,7 +276,7 @@ Desensamblado de la sección .debug_str:
 ```
 
 
-2.  `hexdump -C main.img`: Veremos los bytes puros:
+2.  `hexdump -C main.img`: Se verán los bytes puros:
 
 ```bash!
 dario@dario-N-737R:~/Escritorio/SistemaDeComputacion/SistemaDeComputacion/tp3$ hexdump -C main.img
@@ -375,37 +322,35 @@ dario@dario-N-737R:~/Escritorio/SistemaDeComputacion/SistemaDeComputacion/tp3$
 
 ---
 
-## 4. Prueba en Hardware Real (El USB)
+## 4. Prueba en Hardware Real
 
-Cuando haces:
+Cuando se hace:
 `sudo dd if=main.img of=/dev/sdX`
-Estás borrando la tabla de particiones del USB y escribiendo tu "Hello World" directamente en el primer sector. 
-* **Advertencia:** Ten mucho cuidado de que `/dev/sdX` sea realmente tu USB (puedes usar `lsblk` para verificar) o podrías borrar tu propio disco duro.
-
-Una vez grabado, al apagar tu PC y elegir el USB como arranque, deberías ver las letras blancas sobre fondo negro: `hello world`. ¡Habrás corrido tu propio software sin necesidad de Windows ni Linux!
-
+Se está borrando la tabla de particiones del USB y escribiendo el "Hello World" directamente en el primer sector. 
+* **Advertencia:** Se debe revisar que `/dev/sdX` sea realmente el USB o podrías borrarse el propio disco duro.
 
 # Grabado de pendrive:
 
 ### Paso 1: Compilación y Enlazado (Generar la imagen)
+1) Ensamblar (pasa el texto .S a código máquina .o)
 ```bash
-# 1. Ensamblar (pasa el texto .S a código máquina .o)
 as -g -o main.o main.S
-
-# 2. Enlazar (usa el script .ld para poner todo en su lugar y crear el binario final)
+```
+2) Enlazar (usa el script .ld para poner todo en su lugar y crear el binario final)
+```bash
 ld --oformat binary -o main.img -T link.ld main.o
 ```
 
 ### Paso 2: Identificar tu Pendrive:
 
 
-- 1  conectar pendrive
-- 2  Abrir terminal escribit:
+- 1  Conectar pendrive
+- 2  Abrir terminal y escribir:
 
 ```bash
 lsblk
 ```
-resultado:
+Resultado:
 ```bash
 dario@dario-N-737R:~$ lsblk
 NAME        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
@@ -457,13 +402,13 @@ dario@dario-N-737R:~$
 El pendrive es sda:
 
 
-- ***NAME:*** sda 
+- ***NAME:*** sda. 
 
-- ***SIZE:*** 28,8G (Es pendrive de 32GB, el espacio real siempre es un poco menos).
+- ***SIZE:*** 28,8G.
 
-- ***MOUNTPOINT:*** /media/dario/DARIO (Coincide con el nombre de la carpeta en tu explorador de archivos).
+- ***MOUNTPOINT:*** /media/dario/DARIO.
 
-Le decimos al pendrive que deje de usarlo como carpeta:
+Se le dice al pendrive que deje de usarlo como carpeta:
 
 ```bash
 dario@dario-N-737R:~$ udisksctl unmount -b /dev/sda1
@@ -472,7 +417,7 @@ Unmounted /dev/sda1.
 ```
 
 
-### Paso 3: Grabar la imagen (Comando dd)
+### Paso 3: Grabar la imagen (dd)
 ```
 sudo dd if=main.img of=/dev/sda status=progress && sync
 ```
@@ -487,9 +432,9 @@ dario@dario-N-737R:~/Escritorio/SistemaDeComputacion/SistemaDeComputacion/tp3$
 
 - ***if=main.img:*** El archivo de entrada.
 
-- ***of=/dev/sdX:*** El destino (el USB).
+- ***of=/dev/sdX:*** El destino (USB).
 
-- ***status=progress:*** Para que veamos cuánto falta.
+- ***status=progress:*** Para ver cuánto falta.
 
 - ***sync:*** Asegura que los datos salgan del caché de la memoria al USB antes de sacarlo.
 
@@ -513,7 +458,7 @@ dario@dario-N-737R:~/Escritorio/SistemaDeComputacion/SistemaDeComputacion/tp3$
 
 # 1. Modo Protegido (GDT Manual)
 
-Para pasar a modo protegido sin macros, necesitamos definir la **GDT (Global Descriptor Table)**. Cada descriptor tiene 8 bytes y define la base, el límite y los permisos.
+Para pasar a modo protegido sin macros, se requiere definir la **GDT (Global Descriptor Table)**. Cada descriptor tiene 8 bytes y define la base, el límite y los permisos.
 
 #### `main.S`
 ```assembly
@@ -614,7 +559,7 @@ mov %ax, %ds
 movl %eax, (0xc0000)    #  DEBERÍA FALLAR con #GP (General Protection Fault)
 ```
 
-**¿Qué sucede si escribes en un segmento de solo lectura?**
+**¿Qué sucede si se escribe en un segmento de solo lectura?**
 - **Esperado:** CPU genera interrupción `#13 (GP - General Protection Fault)`
 - **En QEMU sin IDT configurado:** La CPU reinicia (Triple Fault)
 - **Con GDB:** Se puede capturar el punto exacto del fallo
