@@ -565,72 +565,12 @@ gdt_descriptor:
     .long gdt_start
 ```
 
----
-
-### 2. Segmentos Diferenciados
-**¿Cómo sería un programa con descriptores en espacios diferenciados?**
-En lugar de que ambos tengan `Base: 0x00000000`, ajustarías los bytes del descriptor para que, por ejemplo:
-* **Código:** Base `0x00000000`, Límite `0x000FFFFF`.
-* **Datos:** Base `0x00100000`, Límite `0x000FFFFF`.
-
-Esto se logra modificando los campos `Base` (divididos en 3 partes dentro del descriptor de 8 bytes). Esto permitía el aislamiento antes de que la **paginación** se volviera el estándar.
-
-
 
 ---
 
-### 3. Prueba de Solo Lectura (ReadOnly)
-Si cambias el bit de acceso del segmento de datos de **Lectura/Escritura (0x92)** a **Solo Lectura (0x90)**:
+# 2. Modo Protegido Avanzado
 
-* **¿Qué sucede al intentar escribir?** La CPU genera inmediatamente una excepción de **Protección General (#GP - General Protection Fault)**.
-* **¿Qué debería suceder a continuación?** En un SO real, el kernel captura la interrupción 13, detiene el proceso y lanza un "Segmentation Fault". Como aquí no tienes kernel, la CPU entraría en un ciclo de error o se reiniciaría (Triple Fault) si no hay un manejador de IDT configurado.
-* **Verificación con GDB (vía QEMU):**
-    1. Lanza QEMU: `qemu-system-i386 -hda main.img -s -S`
-    2. Conecta GDB: `target remote :1234`
-    3. Al intentar el `mov %ax, (%ebx)`, GDB mostrará que la instrucción no avanza o que la CPU saltó a una dirección de error.
-
----
-
-### 4. Valores de los Registros de Segmento
-**¿Con qué valor se cargan?**
-Ya no se cargan con direcciones de memoria (como `0x07c0`). Se cargan con **Selectores**.
-* **Ejemplo:** `0x08` o `0x10`.
-
-**¿Por qué?**
-Porque en Modo Protegido, el registro de segmento funciona como un **índice** (offset) dentro de la GDT.
-* Los bits 3-15 son el índice en la tabla.
-* El bit 2 indica si es GDT o LDT.
-* Los bits 0-1 son el nivel de privilegio (CPL/RPL), donde `00` es Kernel y `11` es Usuario.
-
-
-
-### Tips para el Linker en este desafío:
-Asegúrate de que tu `link.ld` incluya la sección `.code32`. Si vas a probarlo en hardware real como el anterior, recuerda que una vez que pasas a Modo Protegido, **pierdes el acceso a la BIOS** (`int $0x10` ya no funciona). Por eso en el ejemplo escribimos directamente en la dirección física de video `0xb8000`.
-
----
-
-```bash 
-# Compilar y enlazar
-as -o main.o main.S
-ld --oformat binary -o protected.img -T link.ld main.o
-
-# Correr en QEMU
-sudo apt update 
-
-sudo apt install qemu-system-x86
-
-qemu-system-i386 -hda protected.img
-```
-
-<img src="img/quemuinit.png" >
-
----
-
-# 2. Modo Protegido Avanzado: Cumpliendo la Consigna Completa
-
-Este apartado implementa las pruebas verdaderas para cumplir con todos los requisitos del desafío:
-
-## ✅ Requisito 1: Segmentos Diferenciados
+## Segmentos Diferenciados
 
 En la implementación anterior, los descriptores de código y datos apuntaban a la misma base (`0x00000000`). Aquí creamos **tres descriptores con bases diferentes**:
 
@@ -656,7 +596,7 @@ Donde:
 
 ---
 
-## ✅ Requisito 2: Prueba de Solo Lectura
+##  Requisito 2: Prueba de Solo Lectura
 
 El código `main_avanzado.S` contiene dos pruebas:
 
@@ -664,14 +604,14 @@ El código `main_avanzado.S` contiene dos pruebas:
 ```asm
 mov $0x10, %ax          # Selector de datos normal
 mov %ax, %ds
-movl $0x0f4f0f4f, (0xb8000)   # ✅ Se escribe correctamente ("OO")
+movl $0x0f4f0f4f, (0xb8000)   #  Se escribe correctamente ("OO")
 ```
 
 ### Prueba 2: Intento de Escritura en Segmento READ-ONLY (0x18)
 ```asm
 mov $0x18, %ax          # Selector de segmento solo lectura
 mov %ax, %ds
-movl %eax, (0xc0000)    # ❌ DEBERÍA FALLAR con #GP (General Protection Fault)
+movl %eax, (0xc0000)    #  DEBERÍA FALLAR con #GP (General Protection Fault)
 ```
 
 **¿Qué sucede si escribes en un segmento de solo lectura?**
@@ -681,62 +621,111 @@ movl %eax, (0xc0000)    # ❌ DEBERÍA FALLAR con #GP (General Protection Fault)
 
 ---
 
-## ✅ Requisito 3: Verificación con GDB
+##  Requisito 3: Verificación con GDB
+# Debugging de Modo Protegido
 
-### Paso 1: Compilación
+
+---
+
+##  PASO 1: Preparación
+
+### Terminal 1 - Lanzar QEMU 
 ```bash
-cd modoProtegido
-as -g -o main_avanzado.o main_avanzado.S
-ld --oformat binary -o protected_avanzado.img -T link.ld main_avanzado.o
+cd /home/dario/Escritorio/SistemaDeComputacion/SistemaDeComputacion/tp3/modoProtegido
+qemu-system-i386 -hda protected_avanzado.img -s -S -no-reboot
 ```
 
-### Paso 2: Ejecutar QEMU en Modo Debug
-**Terminal 1:**
+- `-s`: Abre servidor GDB en puerto 1234
+- `-S`: Pausa QEMU al inicio (esperando GDB)
+- `-no-reboot`: Previene reinicio automático
+
+![alt text](img/quemuinit.png)
+
+---
+
+##  PASO 2: Conectar GDB (Terminal 2 - NUEVA TERMINAL)
+
+### Abre otra terminal
 ```bash
-qemu-system-i386 -hda protected_avanzado.img -s -S
+cd /home/dario/Escritorio/SistemaDeComputacion/SistemaDeComputacion/tp3/modoProtegido
 ```
 
-### Paso 3: Conectar GDB
-**Terminal 2:**
+### Inicia GDB con arquitectura i386
 ```bash
-gdb main_avanzado.o
+gdb -ex "set architecture i386" main_avanzado.o
 ```
 
-### Paso 4: Dentro de GDB - Comandos Clave
+
+---
+
+## PASO 3: Conectar a QEMU Remotamente
 
 ```gdb
-# Conectar a QEMU
-target remote :1234
+(gdb) target remote :1234
+```
+![alt text](img/gdb1.png)
 
-# Ver la tabla GDT
-x/24x gdt_start
 
-# Establecer breakpoint en modo protegido
-break protected_mode
 
-# Continuar
-continue
 
-# Ejecutar instrucción por instrucción
-stepi
+---
 
-# Ver registros de segmento
-info registers
+##  PASO 4: Establecer Breakpoint en Modo Protegido
 
-# Leer memoria de video
-x/2x 0xb8000
+```gdb
+(gdb) break protected_mode
+```
 
-# Leer intento de escritura read-only
-x/2x 0xc0000
 
-# Si ocurre #GP, GDB puede no capturarlo directamente
-# Pero podrás ver que la ejecución se detiene o salta
-continue
+---
+
+## ▶ PASO 5: Ejecutar hasta el Breakpoint
+
+```gdb
+(gdb) continue
+```
+![alt text](img/gdb2.png)
+
+---
+
+##  PASO 6: Ver Registros Actuales
+
+```gdb
+(gdb) info registers
+```
+![alt text](img/registros.png)
+
+Los registros CS y DS están con selectores (0x08 y 0x10), NO direcciones.
+
+---
+
+##  PASO 7: Ver el Código Actual
+
+```gdb
+(gdb) list
+```
+![alt text](img/li.png)
+
+
+---
+
+##  PASO 8: Ejecutar Instrucción por Instrucción
+
+```gdb
+(gdb) stepi
+```
+
+Ver registros después de cada paso:
+```gdb
+(gdb) info registers eax ds es ss
 ```
 
 ---
 
-## ✅ Requisito 4: Explicación de Valores de Registro
+
+---
+
+## Requisito 4: Explicación de Valores de Registro
 
 ### Antes de Modo Protegido (Real Mode)
 ```asm
@@ -757,26 +746,5 @@ mov %ax, %cs           # CS contiene SELECTOR, no dirección
 
 ---
 
-## Archivos Generados
 
-```
-modoProtegido/
-├── main_avanzado.S         # Código assembler con 3 descriptores
-├── GDB_GUIDE.md            # Guía completa de GDB
-├── compile.sh              # Script de compilación
-├── link.ld                 # Linker script
-└── protected_avanzado.img  # Imagen booteable
-```
-
----
-
-## Resumen de Cumplimiento
-
-| Requisito | Cumple | Cómo |
-| :--- | :--- | :--- |
-| Código sin macros | ✅ | Descriptores escritos manualmente en bytes |
-| Segmentos diferenciados | ✅ | Base 0x00000000, 0x00100000, 0x00200000 |
-| Prueba de solo lectura | ✅ | Descriptor 0x18 con byte 0x90 (read-only) |
-| Verificación con GDB | ✅ | Script y guía de conexión remota |
-| Explicar registros | ✅ | Selector vs dirección en Modo Protegido |
 
