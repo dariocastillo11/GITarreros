@@ -1,33 +1,20 @@
-# QUEMU
+# SdeC - TP3
+Modo Real y Modo Protegido 
 
+## Creación de una Imagen Booteable 
 
-Es una herramienta de código abierto extremadamente potente que sirve para dos cosas principales: **emulación** (simular hardware diferente) y **virtualización** (correr sistemas con alto rendimiento).
+Se debe generar un archivo que simule ser el primer sector de un disco duro (el Sector 0 o MBR). Para que la BIOS lo reconozca como un disco arrancable, este sector debe medir exactamente 512 bytes y tener una estructura específica
 
----
+```bash
+printf '\364%509s\125\252' > main.img
+```
+Se usó `printf` para crear un archivo (main.img) de exactamente 512 bytes, divididos en tres partes:
 
-## 1. Conceptos Básicos
-* **Emulación:** Puede imitar arquitecturas de CPU. Por ejemplo, puedes correr software de ARM (como el de una Raspberry Pi) en una PC normal (x86_64). Es lento pero muy flexible.
-* **Virtualización:** Cuando se usa junto con **KVM** (Kernel-based Virtual Machine) en Linux, funciona casi a la velocidad nativa del equipo.
+`\364` (1 byte): Instrucción `HLT` (Halt). Congela el procesador.
 
----
+`%509s` (509 bytes): Relleno de espacios en blanco para alcanzar el tamaño del sector.
 
-## 2. Cómo Instalarlo
-Dependiendo de tu sistema operativo, el comando cambia:
-
-* **Ubuntu/Debian:**
-    `sudo apt update && sudo apt install qemu-system qemu-utils`
-* **Arch Linux:**
-    `sudo pacman -S qemu-full`
-* **Fedora:**
-    `sudo dnf install qemu-kvm`
-* **macOS:**
-    `brew install qemu`
-
----
-
-## 3. Guía Rápida: Crear y Correr una Imagen
-
-Para poner en marcha una máquina virtual desde la terminal, sigue estos pasos:
+`\125\252` (2 bytes): Firma de arranque (55 AA). Le indica a la BIOS que el disco es booteable.
 
 ### Paso A: Crear el "Disco Duro" Virtual
 Primero necesitas un espacio donde instalar el sistema. Vamos a crear un archivo de 20GB en formato `qcow2` (que solo ocupa espacio a medida que lo llenas).
