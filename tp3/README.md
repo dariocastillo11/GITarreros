@@ -624,3 +624,159 @@ qemu-system-i386 -hda protected.img
 
 <img src="img/quemuinit.png" >
 
+---
+
+# 2. Modo Protegido Avanzado: Cumpliendo la Consigna Completa
+
+Este apartado implementa las pruebas verdaderas para cumplir con todos los requisitos del desafío:
+
+## ✅ Requisito 1: Segmentos Diferenciados
+
+En la implementación anterior, los descriptores de código y datos apuntaban a la misma base (`0x00000000`). Aquí creamos **tres descriptores con bases diferentes**:
+
+| Selector | Nombre | Base | Límite | Permisos | Uso |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **0x08** | Código | `0x00000000` | 4GB | Ejecutable/Lectura/Escritura | Instrucciones del programa |
+| **0x10** | Datos RW | `0x00100000` | 1MB | Lectura/Escritura | Datos modificables |
+| **0x18** | Datos RO | `0x00200000` | 1MB | **SOLO LECTURA** | Prueba de protección |
+
+### Estructura de un Descriptor GDT (8 bytes)
+```
+Bits:  63-56  55-52  51-48  47-40  39-32  31-24  23-16  15-0
+      [Base3][Gran] [Res] [Pres][DPL] [Type][Base2][Base1][Limit]
+      
+Donde:
+- Base (3 partes): 0x00100000 se divide en Base3:Base2:Base1:Base0
+- Gran (bit 55): Granularidad (1=4KB pages, 0=bytes)
+- Pres (bit 47): Present (1=válido)
+- DPL (bits 46-45): Nivel de privilegio (00=Kernel, 11=Usuario)
+- Type (bits 43-40): 0x9 = Segmento de datos, 0xA = Código
+- 0x90 = Solo Lectura, 0x92 = Lectura/Escritura
+```
+
+---
+
+## ✅ Requisito 2: Prueba de Solo Lectura
+
+El código `main_avanzado.S` contiene dos pruebas:
+
+### Prueba 1: Escritura Normal (0x10 - Lectura/Escritura)
+```asm
+mov $0x10, %ax          # Selector de datos normal
+mov %ax, %ds
+movl $0x0f4f0f4f, (0xb8000)   # ✅ Se escribe correctamente ("OO")
+```
+
+### Prueba 2: Intento de Escritura en Segmento READ-ONLY (0x18)
+```asm
+mov $0x18, %ax          # Selector de segmento solo lectura
+mov %ax, %ds
+movl %eax, (0xc0000)    # ❌ DEBERÍA FALLAR con #GP (General Protection Fault)
+```
+
+**¿Qué sucede si escribes en un segmento de solo lectura?**
+- **Esperado:** CPU genera interrupción `#13 (GP - General Protection Fault)`
+- **En QEMU sin IDT configurado:** La CPU reinicia (Triple Fault)
+- **Con GDB:** Se puede capturar el punto exacto del fallo
+
+---
+
+## ✅ Requisito 3: Verificación con GDB
+
+### Paso 1: Compilación
+```bash
+cd modoProtegido
+as -g -o main_avanzado.o main_avanzado.S
+ld --oformat binary -o protected_avanzado.img -T link.ld main_avanzado.o
+```
+
+### Paso 2: Ejecutar QEMU en Modo Debug
+**Terminal 1:**
+```bash
+qemu-system-i386 -hda protected_avanzado.img -s -S
+```
+
+### Paso 3: Conectar GDB
+**Terminal 2:**
+```bash
+gdb main_avanzado.o
+```
+
+### Paso 4: Dentro de GDB - Comandos Clave
+
+```gdb
+# Conectar a QEMU
+target remote :1234
+
+# Ver la tabla GDT
+x/24x gdt_start
+
+# Establecer breakpoint en modo protegido
+break protected_mode
+
+# Continuar
+continue
+
+# Ejecutar instrucción por instrucción
+stepi
+
+# Ver registros de segmento
+info registers
+
+# Leer memoria de video
+x/2x 0xb8000
+
+# Leer intento de escritura read-only
+x/2x 0xc0000
+
+# Si ocurre #GP, GDB puede no capturarlo directamente
+# Pero podrás ver que la ejecución se detiene o salta
+continue
+```
+
+---
+
+## ✅ Requisito 4: Explicación de Valores de Registro
+
+### Antes de Modo Protegido (Real Mode)
+```asm
+mov $0x07c0, %ax       # Dirección física de memoria
+mov %ax, %ds           # DS contiene dirección real
+```
+
+### En Modo Protegido
+```asm
+mov $0x08, %ax         # Selector (índice en GDT)
+mov %ax, %cs           # CS contiene SELECTOR, no dirección
+
+# El selector 0x08 se interpreta como:
+# Bits 3-15: 1 (índice 1 en GDT)
+# Bit 2: 0 (usar GDT)
+# Bits 0-1: 0 (nivel kernel)
+```
+
+---
+
+## Archivos Generados
+
+```
+modoProtegido/
+├── main_avanzado.S         # Código assembler con 3 descriptores
+├── GDB_GUIDE.md            # Guía completa de GDB
+├── compile.sh              # Script de compilación
+├── link.ld                 # Linker script
+└── protected_avanzado.img  # Imagen booteable
+```
+
+---
+
+## Resumen de Cumplimiento
+
+| Requisito | Cumple | Cómo |
+| :--- | :--- | :--- |
+| Código sin macros | ✅ | Descriptores escritos manualmente en bytes |
+| Segmentos diferenciados | ✅ | Base 0x00000000, 0x00100000, 0x00200000 |
+| Prueba de solo lectura | ✅ | Descriptor 0x18 con byte 0x90 (read-only) |
+| Verificación con GDB | ✅ | Script y guía de conexión remota |
+| Explicar registros | ✅ | Selector vs dirección en Modo Protegido |
+

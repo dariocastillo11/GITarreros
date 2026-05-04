@@ -47,7 +47,7 @@ gdt_start:
     # Descriptor de Datos (Base 0, Límite 4GB)
     # Selector: 0x10
     # CAMBIO AQUÍ: 0x90 es Solo Lectura | 0x92 es Lectura/Escritura
-    .quad 0x00cf9000000ffff     
+    .quad 0x00cf9200000ffff     
 gdt_end:
 
 gdt_descriptor:
