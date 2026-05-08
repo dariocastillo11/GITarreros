@@ -1,0 +1,5 @@
+@startuml
+rectangle "Handle 1: BlockIo" as h1
+rectangle "Handle 2: SimpleInput" as h2
+rectangle "Handle 3: SimpleText" as h3
+@enduml
