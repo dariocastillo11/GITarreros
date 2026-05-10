@@ -1,5 +1,4 @@
-# SdeC - TP3
-Modo Real y Modo Protegido 
+# Sistemas de Computación - TP3: Modo Real y Modo Protegido 
 
 ## Creación de una Imagen Booteable 
 
@@ -23,44 +22,7 @@ Como no se puede ejecutar este sector de arranque directamente en la computadora
 
 <img width="717" height="292" alt="image" src="https://github.com/user-attachments/assets/b7484ad3-6362-4ea5-971a-d3993aaa743c" />
 
-
-# 1. Desafío: UEFI y coreboot
----
-## **¿Qué es UEFI? ¿Cómo puedo usarlo?**
-UEFI (*Unified Extensible Firmware Interface*) es el sucesor de la BIOS. A diferencia de la BIOS, que es código de 16 bits muy limitado, UEFI es un pequeño "sistema operativo" en sí mismo, escrito en C, que corre en 32 o 64 bits.
-* **Cómo usarlo:** Para programar para UEFI, no se usan interrupciones de BIOS (`int 0x10`). Debe crearse un archivo `.efi` (formato PE, como los .exe de Windows) y usar las "Boot Services" que proporciona el firmware.
-* **Función de ejemplo:** `Print()` o `OutputString()`. En UEFI se accede a través de una tabla de punteros llamada `SystemTable->ConOut->OutputString`.
----
-
-## **Bugs de UEFI explotados:**
-Al ser un software complejo, tiene vulnerabilidades.
-* **LogoFAIL:** Reciente bug donde atacantes usan imágenes de logo de arranque (JPG/BMP) maliciosas para ejecutar código antes que el SO.
-* **BlackLotus:** Un bootkit que logra saltarse el *Secure Boot* (Arranque Seguro) para persistir en el sistema incluso si se reinstala Windows.
----
-## **CSME y Intel MEBx**
-* **CSME:** Converged Security and Management Engine es un subsistema dentro de los procesadores Intel que corre un kernel (generalmente Minix) totalmente independiente del procesador principal. Controla el encendido, la criptografía y la gestión remota. Es el anillo -3 de seguridad.
-* **Intel MEBx:** Intel Management Engine BIOS Extension es la interfaz de configuración de este motor. Se suele acceder con `Ctrl+P` durante el booteo para configurar la administración remota (AMT).
----
-## **¿Qué es Coreboot?**
-Es un proyecto de software libre que busca reemplazar la BIOS/UEFI privativa de las placas base por un firmware mínimo y rápido.
-* **Productos:** Computadoras de System76, Purism, o las famosas Chromebooks de Google.
-* **Ventajas:** Mucho más rápido (bootea en segundos), mayor seguridad  y elimina "blobs" binarios innecesarios.
-
----
-
-
-
-
-
-
-
-
-
-
-
-
-
-# 2. Análisis del "Hello World" (Linker y Código)
+## Análisis del "Hello World" (Linker y Código)
 
 **link.d:**
 ```ld
@@ -109,27 +71,8 @@ as -g -o main.o main.S
 ld --oformat binary -o main.img -T link.ld main.o
 
 ```
-
-
-
-
 ---
-
-## **¿Qué es un Linker y qué hace?**
-El linker (enlazador) toma los archivos objeto (`main.o`) y decide dónde colocar cada sección de código y datos en el archivo final (`main.img`). Resuelve las direcciones de memoria para que cuando el código diga `jmp loop`, el salto vaya a la dirección correcta.
-
----
-
-## **¿Qué es la dirección `0x7c00`? ¿Por qué es necesaria?**
-Es una dirección **mágica**. Por estándar histórico, la BIOS busca el primer sector del disco (512 bytes), lo copia exactamente en la dirección de memoria RAM `0x0000:0x7C00` y luego le dice a la CPU: "empieza a ejecutar desde aquí".
-* **Necesidad:** El linker necesita saber esto para que las etiquetas (como `msg`) tengan la dirección de memoria real correcta. Si el linker cree que el código empieza en `0x0000` pero la BIOS lo pone en `0x7C00`, el programa buscará el texto en el lugar equivocado y fallará.
-
-**Opción `--oformat binary`:**
-Normalmente, el linker crea archivos tipo ELF (que tienen cabeceras para Linux). La opción `binary` le exige tirar los bytes puros. Esto es vital porque el hardware real no entiende formatos de archivos, solo ejecuta bytes.
-
----
-
-## 3. Comparativa: `objdump` vs `hd` (Heardump)
+## Comparativa: `objdump` vs `hd` (Heardump)
 
 1.  `objdump -D main.o`: Se verá el código ensamblador y cómo el linker aún no sabe las direcciones finales:
 ```bash
@@ -322,14 +265,14 @@ dario@dario-N-737R:~/Escritorio/SistemaDeComputacion/SistemaDeComputacion/tp3$
 
 ---
 
-## 4. Prueba en Hardware Real
+## Prueba en Hardware Real
 
 Cuando se hace:
 `sudo dd if=main.img of=/dev/sdX`
 Se está borrando la tabla de particiones del USB y escribiendo el "Hello World" directamente en el primer sector. 
 * **Advertencia:** Se debe revisar que `/dev/sdX` sea realmente el USB o podrías borrarse el propio disco duro.
 
-# Grabado de pendrive:
+## Grabado de pendrive:
 
 ### Paso 1: Compilación y Enlazado (Generar la imagen)
 1) Ensamblar (pasa el texto .S a código máquina .o)
@@ -344,8 +287,8 @@ ld --oformat binary -o main.img -T link.ld main.o
 ### Paso 2: Identificar tu Pendrive:
 
 
-- 1  Conectar pendrive
-- 2  Abrir terminal y escribir:
+1)  Conectar pendrive
+2)  Abrir terminal y escribir:
 
 ```bash
 lsblk
@@ -456,7 +399,7 @@ dario@dario-N-737R:~/Escritorio/SistemaDeComputacion/SistemaDeComputacion/tp3$
 
 ---
 
-# 1. Modo Protegido (GDT Manual)
+# Modo Protegido (GDT Manual)
 
 Para pasar a modo protegido sin macros, se requiere definir la **GDT (Global Descriptor Table)**. Cada descriptor tiene 8 bytes y define la base, el límite y los permisos.
 
@@ -513,7 +456,7 @@ gdt_descriptor:
 
 ---
 
-# 2. Modo Protegido Avanzado
+# Modo Protegido Avanzado
 
 ## Segmentos Diferenciados
 
@@ -541,7 +484,7 @@ Donde:
 
 ---
 
-##  Requisito 2: Prueba de Solo Lectura
+## Prueba de Solo Lectura
 
 El código `main_avanzado.S` contiene dos pruebas:
 
@@ -558,17 +501,10 @@ mov $0x18, %ax          # Selector de segmento solo lectura
 mov %ax, %ds
 movl %eax, (0xc0000)    #  DEBERÍA FALLAR con #GP (General Protection Fault)
 ```
-
-**¿Qué sucede si se escribe en un segmento de solo lectura?**
-- **Esperado:** CPU genera interrupción `#13 (GP - General Protection Fault)`
-- **En QEMU sin IDT configurado:** La CPU reinicia (Triple Fault)
-- **Con GDB:** Se puede capturar el punto exacto del fallo
-
 ---
 
 ##  Requisito 3: Verificación con GDB
 # Debugging de Modo Protegido
-
 
 ---
 
@@ -589,8 +525,6 @@ qemu-system-i386 -hda protected_avanzado.img -s -S -no-reboot
 ---
 
 ##  PASO 2: Conectar GDB (Terminal 2 - NUEVA TERMINAL)
-
-### Abre otra terminal
 ```bash
 cd /home/dario/Escritorio/SistemaDeComputacion/SistemaDeComputacion/tp3/modoProtegido
 ```
@@ -615,7 +549,7 @@ gdb -ex "set architecture i386" main_avanzado.o
 
 ---
 
-##  PASO 4: Establecer Breakpoint en Modo Protegido
+## PASO 4: Establecer Breakpoint en Modo Protegido
 
 ```gdb
 (gdb) break protected_mode
@@ -624,7 +558,7 @@ gdb -ex "set architecture i386" main_avanzado.o
 
 ---
 
-## ▶ PASO 5: Ejecutar hasta el Breakpoint
+## PASO 5: Ejecutar hasta el Breakpoint
 
 ```gdb
 (gdb) continue
@@ -644,7 +578,7 @@ Los registros CS y DS están con selectores (0x08 y 0x10), NO direcciones.
 
 ---
 
-##  PASO 7: Ver el Código Actual
+## PASO 7: Ver el Código Actual
 
 ```gdb
 (gdb) list
@@ -654,7 +588,7 @@ Los registros CS y DS están con selectores (0x08 y 0x10), NO direcciones.
 
 ---
 
-##  PASO 8: Ejecutar Instrucción por Instrucción
+## PASO 8: Ejecutar Instrucción por Instrucción
 
 ```gdb
 (gdb) stepi
@@ -690,6 +624,45 @@ mov %ax, %cs           # CS contiene SELECTOR, no dirección
 ```
 
 ---
+# UEFI y coreboot
+---
+## **¿Qué es UEFI? ¿Cómo puedo usarlo?**
+UEFI (*Unified Extensible Firmware Interface*) es el sucesor de la BIOS. A diferencia de la BIOS, que es código de 16 bits muy limitado, UEFI es un pequeño "sistema operativo" en sí mismo, escrito en C, que corre en 32 o 64 bits.
+* **Cómo usarlo:** Para programar para UEFI, no se usan interrupciones de BIOS (`int 0x10`). Debe crearse un archivo `.efi` (formato PE, como los .exe de Windows) y usar las "Boot Services" que proporciona el firmware.
+* **Función de ejemplo:** `Print()` o `OutputString()`. En UEFI se accede a través de una tabla de punteros llamada `SystemTable->ConOut->OutputString`.
+---
 
+## **Bugs de UEFI explotados:**
+Al ser un software complejo, tiene vulnerabilidades.
+* **LogoFAIL:** Reciente bug donde atacantes usan imágenes de logo de arranque (JPG/BMP) maliciosas para ejecutar código antes que el SO.
+* **BlackLotus:** Un bootkit que logra saltarse el *Secure Boot* (Arranque Seguro) para persistir en el sistema incluso si se reinstala Windows.
+---
+## **CSME y Intel MEBx**
+* **CSME:** Converged Security and Management Engine es un subsistema dentro de los procesadores Intel que corre un kernel (generalmente Minix) totalmente independiente del procesador principal. Controla el encendido, la criptografía y la gestión remota. Es el anillo -3 de seguridad.
+* **Intel MEBx:** Intel Management Engine BIOS Extension es la interfaz de configuración de este motor. Se suele acceder con `Ctrl+P` durante el booteo para configurar la administración remota (AMT).
+---
+## **¿Qué es Coreboot?**
+Es un proyecto de software libre que busca reemplazar la BIOS/UEFI privativa de las placas base por un firmware mínimo y rápido.
+* **Productos:** Computadoras de System76, Purism, o las famosas Chromebooks de Google.
+* **Ventajas:** Mucho más rápido (bootea en segundos), mayor seguridad  y elimina "blobs" binarios innecesarios.
 
+---
+
+## **¿Qué es un Linker y qué hace?**
+El linker (enlazador) toma los archivos objeto (`main.o`) y decide dónde colocar cada sección de código y datos en el archivo final (`main.img`). Resuelve las direcciones de memoria para que cuando el código diga `jmp loop`, el salto vaya a la dirección correcta.
+
+---
+
+## **¿Qué es la dirección `0x7c00`? ¿Por qué es necesaria?**
+Es una dirección **mágica**. Por estándar histórico, la BIOS busca el primer sector del disco (512 bytes), lo copia exactamente en la dirección de memoria RAM `0x0000:0x7C00` y luego le dice a la CPU: "empieza a ejecutar desde aquí".
+* **Necesidad:** El linker necesita saber esto para que las etiquetas (como `msg`) tengan la dirección de memoria real correcta. Si el linker cree que el código empieza en `0x0000` pero la BIOS lo pone en `0x7C00`, el programa buscará el texto en el lugar equivocado y fallará.
+
+**Opción `--oformat binary`:**
+Normalmente, el linker crea archivos tipo ELF (que tienen cabeceras para Linux). La opción `binary` le exige tirar los bytes puros. Esto es vital porque el hardware real no entiende formatos de archivos, solo ejecuta bytes.
+
+---
+**¿Qué sucede si se escribe en un segmento de solo lectura?**
+- **Esperado:** CPU genera interrupción `#13 (GP - General Protection Fault)`
+- **En QEMU sin IDT configurado:** La CPU reinicia (Triple Fault)
+- **Con GDB:** Se puede capturar el punto exacto del fallo
 

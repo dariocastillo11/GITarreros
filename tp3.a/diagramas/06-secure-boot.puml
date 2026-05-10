@@ -1,0 +1,10 @@
+@startuml
+rectangle "Bootloader" as boot
+rectangle "Firma valida?" as check
+rectangle "EJECUTA" as exec
+rectangle "BLOQUEA" as block
+
+boot --> check
+check --> exec: SI
+check --> block: NO
+@enduml

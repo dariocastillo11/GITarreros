@@ -1,0 +1,6 @@
+@startuml
+rectangle "UEFI\n(Especificacion)" as uefi
+rectangle "PI\n(Implementacion)" as pi
+
+uefi --> pi : "define"
+@enduml
