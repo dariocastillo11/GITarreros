@@ -1,0 +1,9 @@
+@startuml
+start
+: SEC: Cache a RAM;
+: PEI: RAM principal;
+: DXE: Drivers;
+: BDS: Bootloader;
+: Runtime Services;
+end
+@enduml

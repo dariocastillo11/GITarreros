@@ -1,0 +1,7 @@
+@startuml
+participant "Dispatcher" as dxe
+participant "Driver USB" as usb
+
+dxe -> usb: Carga pero NO conecta
+note right of usb: Lazy Loading\nEspera si lo pide SO
+@enduml
