@@ -1,6 +1,0 @@
-@startuml
-rectangle "UEFI System Table" {
-    rectangle "Boot Services" as boot
-    rectangle "Runtime Services" as runtime
-}
-@enduml
