@@ -1,28 +1,56 @@
-Checkinstall es una herramienta que rastrea los archivos instalados durante su compilacion del codigo fuente y genera un paquete .deb o .rpm con el objetivo de poder instalar o desinstalar el software por medio del gestor de paquetes de nuestro sistema. Esta herramienta a paquetes Slackware, Debian o RPM. Para poder utilizarlo se debe crear un ./configure antes de compilar el codigo con, por ejemplo, make, luego utilizando sudo checkinstall, se encargara del empaquetado e instalacion del programa. Podemos comprobar su funcionamiento con el siguiente ejemplo para instalar FreeCad:
+CheckInstall
 
-1 instalacion checkinstall:
-    sudo apt install checkinstall build-essential cmake git
+Breve descripción
 
-2 descarga de dependencias necesarias para FreeCad:
-    sudo add-apt-repository --enable-source ppa:freecad-maintainers/freecad-stable
-    sudo apt update
-    sudo apt build-dep freecad
+`checkinstall` es una herramienta que rastrea los archivos instalados durante la compilación desde código fuente y genera un paquete `.deb`, `.rpm` (o para otras distribuciones) con el objetivo de poder instalar o desinstalar el software mediante el gestor de paquetes del sistema.
 
-3 Clonado del repositorio de FreeCad:
-    git clone --depth 1 https://github.com/FreeCAD/FreeCAD.git
-    cd FreeCAD
+Antes de utilizar `checkinstall` normalmente se ejecuta `./configure` (si aplica) y luego se compila el proyecto con `make`. En lugar de ejecutar `sudo make install`, se usa `sudo checkinstall` para crear e instalar el paquete.
 
-4 Configuracion y compilacion:
-    una vez en la carpeta de FreeCAD realizamos lo siguiente:
-        mkdir build
-        cd build
-        cmake ..
+Ejemplo: compilación e instalación de FreeCAD
+
+1) Instalación de herramientas necesarias:
+
+```bash
+sudo apt install checkinstall build-essential cmake git
+```
+
+2) Descarga de dependencias para FreeCAD:
+
+```bash
+sudo add-apt-repository --enable-source ppa:freecad-maintainers/freecad-stable
+sudo apt update
+sudo apt build-dep freecad
+```
+
+3) Clonado del repositorio de FreeCAD:
+
+```bash
+git clone --depth 1 https://github.com/FreeCAD/FreeCAD.git
+cd FreeCAD
+```
+
+4) Configuración y compilación:
+
+```bash
+mkdir build
+cd build
+cmake ..
+```
 
 ![alt text](image-1.png)
 
-en el caso de proyectos tan grandes como este es muy probable que nos encontremos con multiples dificultades a la hora de compilar el programa, asi como dependencias y configuraciones. El proceso de compilacion luego de configurar el proyecto con cmake se hizo con make -j$(nproc) que utiliza todos los nucleos del dispositivo para llevarlo a cabo. Aun asi este proceso para projectos de tal tamaño puede llevar mucho tiempo y contar con multiples errores. Es por esto que no se llevara a cabo en su totalidad lastimosamente para este trabajo, al estar fuera del scope de tiempo el arreglar los errores encontrados.
+En proyectos grandes es frecuente encontrar múltiples dificultades al compilar, así como dependencias y configuraciones específicas. En este caso la compilación (tras configurar con CMake) se realizó con:
 
-En caso de haber llevado a cabo esta compilacion exitosamente podriamos haber instalado el programa utilizando:
+```bash
+make -j$(nproc)
+```
+
+que utiliza todos los núcleos disponibles. Este proceso puede tardar mucho y presentar numerosos errores; por limitaciones de tiempo no se completó totalmente para este trabajo.
+
+Si la compilación se completa correctamente, la instalación mediante `checkinstall` se realiza con:
+
+```bash
 sudo checkinstall
+```
 
-que se podra ver en otros casos de uso en este trabajo.
+La creación del paquete y su instalación pueden visualizarse en otros casos de uso dentro de este trabajo.
