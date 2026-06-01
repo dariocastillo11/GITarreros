@@ -1,0 +1,6 @@
+[submodule "kernel-modules"]
+	path = kernel-modules
+	url = git@gitlab.com:joa.suarez/kernel-modules.git
+[submodule "tp4/kernel-modules"]
+	path = tp4/kernel-modules
+	url = git@gitlab.com:joa.suarez/kernel-modules.git
