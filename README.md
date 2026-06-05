@@ -17,4 +17,7 @@ Utilizamos ramas propias y mergeamos a main
 2. [TP1 - Rendimiento](tp1/README.md)
 3. [TP2 - Stack Frame](tp2/README.md)
 4. [TP3 - UEFI - LINKER - MODO PROTEGIDO](tp3/README.md)
+5. [TP4 - Módulo Kernel](tp4/README.md)
+6. [TP5 - Drivers](tp5/README.md)
+7. [TP6 - Dockerd](tpextra/README.md)
 ---
