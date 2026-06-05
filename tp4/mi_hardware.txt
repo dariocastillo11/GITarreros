@@ -1,0 +1,98 @@
+cpu:
+                       AMD Ryzen 7 3700U with Radeon Vega Mobile Gfx, 2238 MHz
+                       AMD Ryzen 7 3700U with Radeon Vega Mobile Gfx, 2475 MHz
+                       AMD Ryzen 7 3700U with Radeon Vega Mobile Gfx, 2189 MHz
+                       AMD Ryzen 7 3700U with Radeon Vega Mobile Gfx, 2158 MHz
+                       AMD Ryzen 7 3700U with Radeon Vega Mobile Gfx, 2219 MHz
+                       AMD Ryzen 7 3700U with Radeon Vega Mobile Gfx, 2193 MHz
+                       AMD Ryzen 7 3700U with Radeon Vega Mobile Gfx, 3722 MHz
+                       AMD Ryzen 7 3700U with Radeon Vega Mobile Gfx, 2584 MHz
+keyboard:
+  /dev/input/event12   YK 2.4G Wireless Device
+  /dev/input/event4    AT Translated Set 2 keyboard
+mouse:
+  /dev/input/mice      KYE Genius DX-120 Mouse
+  /dev/input/mice      YK 2.4G Wireless Device
+  /dev/input/mice      PNP0C50:00 093A:0255 Mouse
+  /dev/input/mice      PNP0C50:00 093A:0255 Touchpad
+monitor:
+                       LCD Monitor
+graphics card:
+                       ATI Picasso
+sound:
+                       ATI Raven/Raven2/Fenghuang HDMI/DP Audio Controller
+                       AMD Family 17h (Models 10h-1fh) HD Audio Controller
+storage:
+                       Kingston Technology Company Non-Volatile memory controller
+                       AMD FCH SATA Controller [AHCI mode]
+network:
+  enp3s0               Realtek RTL8111/8168 PCI Express Gigabit Ethernet controller
+  wlp2s0               Realtek RTL8822CE 802.11ac PCIe Wireless Network Adapter
+network interface:
+  veth9d4f7d5          Ethernet network interface
+  br-ebd50f241d13      Ethernet network interface
+  br-86e80529457b      Ethernet network interface
+  docker0              Ethernet network interface
+  enp3s0               Ethernet network interface
+  br-c4d158a8a041      Ethernet network interface
+  wlp2s0               Ethernet network interface
+  br-96385d07a88a      Ethernet network interface
+  lo                   Loopback network interface
+  veth73f18bb          Ethernet network interface
+disk:
+  /dev/nvme0n1         Kingston Technology Company Disk
+  /dev/mmcblk0         Disk
+partition:
+  /dev/nvme0n1p1       Partition
+  /dev/nvme0n1p2       Partition
+  /dev/nvme0n1p3       Partition
+  /dev/nvme0n1p4       Partition
+  /dev/nvme0n1p5       Partition
+  /dev/mmcblk0p1       Partition
+  /dev/mmcblk0p2       Partition
+usb controller:
+                       AMD Raven USB 3.1
+                       AMD Raven USB 3.1
+bios:
+                       BIOS
+bridge:
+                       AMD Family 17h (Models 00h-1fh) PCIe Dummy Host Bridge
+                       AMD Raven/Raven2 Device 24: Function 3
+                       AMD Raven/Raven2 PCIe GPP Bridge [6:0]
+                       AMD Raven/Raven2 Device 24: Function 1
+                       AMD Family 17h (Models 00h-1fh) PCIe Dummy Host Bridge
+                       AMD FCH LPC Bridge
+                       AMD Raven/Raven2 Device 24: Function 6
+                       AMD Raven/Raven2 PCIe GPP Bridge [6:0]
+                       AMD Raven/Raven2 Root Complex
+                       AMD Raven/Raven2 Internal PCIe GPP Bridge 0 to Bus A
+                       AMD Raven/Raven2 Device 24: Function 4
+                       AMD Raven/Raven2 Device 24: Function 2
+                       AMD Raven/Raven2 Device 24: Function 0
+                       AMD Raven/Raven2 Device 24: Function 7
+                       AMD Raven/Raven2 PCIe GPP Bridge [6:0]
+                       AMD Raven/Raven2 Internal PCIe GPP Bridge 0 to Bus B
+                       AMD Raven/Raven2 Device 24: Function 5
+hub:
+                       Linux Foundation 2.0 root hub
+                       Genesys Logic Hub
+                       Linux Foundation 3.0 root hub
+                       Linux Foundation 2.0 root hub
+                       Genesys Logic Hub
+                       Linux Foundation 3.0 root hub
+memory:
+                       Main Memory
+bluetooth:
+                       Realtek Bluetooth Radio
+unknown:
+                       FPU
+                       DMA controller
+                       PIC
+                       Keyboard controller
+                       PS/2 Controller
+                       AMD Raven/Raven2 IOMMU
+                       AMD Family 17h (Models 10h-1fh) Platform Security Processor
+                       AMD FCH SMBus Controller
+                       DX-240424-H Hy-UXGA(B5M2)-Camera
+                       Realtek RTS5129 Card Reader Controller
+                       KYE Genius DX-120 Mouse
