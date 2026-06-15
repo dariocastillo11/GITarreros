@@ -1,0 +1,65 @@
+
+main.o:     formato del fichero elf64-x86-64
+
+
+Desensamblado de la sección .text:
+
+0000000000000000 <_start>:
+   0:	be 00 00 b4 0e       	mov    $0xeb40000,%esi
+
+0000000000000005 <loop>:
+   5:	ac                   	lods   %ds:(%rsi),%al
+   6:	08 c0                	or     %al,%al
+   8:	74 04                	je     e <halt>
+   a:	cd 10                	int    $0x10
+   c:	eb f7                	jmp    5 <loop>
+
+000000000000000e <halt>:
+   e:	f4                   	hlt
+
+000000000000000f <msg>:
+   f:	47                   	rex.RXB
+  10:	49 54                	rex.WB push %r12
+  12:	61                   	(bad)
+  13:	72 72                	jb     87 <msg+0x78>
+  15:	65 72 6f             	gs jb  87 <msg+0x78>
+  18:	73 20                	jae    3a <msg+0x2b>
+  1a:	4f 53                	rex.WRXB push %r11
+  1c:	20 76 31             	and    %dh,0x31(%rsi)
+  1f:	2e 30 20             	cs xor %ah,(%rax)
+  22:	2d 20 32 30 32       	sub    $0x32303220,%eax
+  27:	36 0d 0a 50 72 6f    	ss or  $0x6f72500a,%eax
+  2d:	66 3a 20             	data16 cmp (%rax),%ah
+  30:	4a 61                	rex.WX (bad)
+  32:	76 69                	jbe    9d <msg+0x8e>
+  34:	65 72 20             	gs jb  57 <msg+0x48>
+  37:	4a 6f                	rex.WX outsl %ds:(%rsi),(%dx)
+  39:	72 67                	jb     a2 <msg+0x93>
+  3b:	65 20 43 61          	and    %al,%gs:0x61(%rbx)
+  3f:	73 74                	jae    b5 <msg+0xa6>
+  41:	69 6c 6c 6f 2c 20 53 	imul   $0x7553202c,0x6f(%rsp,%rbp,2),%ebp
+  48:	75 
+  49:	61                   	(bad)
+  4a:	72 65                	jb     b1 <msg+0xa2>
+  4c:	7a 2c                	jp     7a <msg+0x6b>
+  4e:	20 4d 61             	and    %cl,0x61(%rbp)
+  51:	72 74                	jb     c7 <msg+0xb8>
+  53:	69 6e 65 7a 20 4f 70 	imul   $0x704f207a,0x65(%rsi),%ebp
+  5a:	72 69                	jb     c5 <msg+0xb6>
+  5c:	6d                   	insl   (%dx),%es:(%rdi)
+  5d:	61                   	(bad)
+  5e:	0d 0a 50 72 65       	or     $0x6572500a,%eax
+  63:	73 69                	jae    ce <msg+0xbf>
+  65:	6f                   	outsl  %ds:(%rsi),(%dx)
+  66:	6e                   	outsb  %ds:(%rsi),(%dx)
+  67:	65 20 75 6e          	and    %dh,%gs:0x6e(%rbp)
+  6b:	61                   	(bad)
+  6c:	20 74 65 63          	and    %dh,0x63(%rbp,%riz,2)
+  70:	6c                   	insb   (%dx),%es:(%rdi)
+  71:	61                   	(bad)
+  72:	20 70 61             	and    %dh,0x61(%rax)
+  75:	72 61                	jb     d8 <msg+0xc9>
+  77:	20 69 6e             	and    %ch,0x6e(%rcx)
+  7a:	69 63 69 61 72 2e 2e 	imul   $0x2e2e7261,0x69(%rbx),%esp
+  81:	2e                   	cs
+	...
