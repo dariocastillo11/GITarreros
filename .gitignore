@@ -30,3 +30,9 @@ tp1/perf.data
 tp1/perf.data.old
 tp1/perf.unfolded
 tp1/test_gprof
+tp5/rpi-linux/
+tp5/venv-qemu/
+tp5/2020-02-13-raspbian-buster-lite.img
+tp5/2020-02-13-raspbian-buster-lite.zip
+tp5/kernel-qemu-4.19.50-buster
+
